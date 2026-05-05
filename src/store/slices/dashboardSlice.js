@@ -1,33 +1,33 @@
 // src/store/slices/dashboardSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../api/client';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../api/client";
 
 export const fetchDashboardStats = createAsyncThunk(
-  'dashboard/fetchStats',
+  "dashboard/fetchStats",
   async () => {
-    const response = await api.get('/admin/dashboard');
+    const response = await api.get("/admin/dashboard");
     return response.data;
-  }
+  },
 );
 
 export const fetchAnalytics = createAsyncThunk(
-  'dashboard/fetchAnalytics',
-  async (period = 'month') => {
+  "dashboard/fetchAnalytics",
+  async (period = "month") => {
     const response = await api.get(`/admin/analytics?period=${period}`);
     return response.data;
-  }
+  },
 );
 
 export const fetchActivityLogs = createAsyncThunk(
-  'dashboard/fetchActivityLogs',
+  "dashboard/fetchActivityLogs",
   async (params = {}) => {
-    const response = await api.get('/admin/logs/activity', { params });
+    const response = await api.get("/admin/logs/activity", { params });
     return response.data;
-  }
+  },
 );
 
 const dashboardSlice = createSlice({
-  name: 'dashboard',
+  name: "dashboard",
   initialState: {
     stats: null,
     analytics: null,
