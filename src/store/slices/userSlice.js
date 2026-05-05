@@ -39,10 +39,12 @@ export const fetchUsers = createAsyncThunk(
         );
       }
     } catch (error) {
-      console.error("Fetch users error:", error);
+      // ✅ Check for CanceledError FIRST, before logging
       if (error.name === "CanceledError") {
         return rejectWithValue("canceled");
       }
+      // ✅ Only log NON-canceled errors
+      console.error("Fetch users error:", error);
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
@@ -75,14 +77,21 @@ export const toggleUserStatus = createAsyncThunk(
   async ({ id, isActive }, { rejectWithValue }) => {
     try {
       const response = await api.put(`/admin/users/${id}/status`, { isActive });
+      console.log("Toggle status API response:", response.data);
+
       if (response.data.success) {
         toast.success(`User ${isActive ? "activated" : "deactivated"}`);
-        return { id, isActive };
+        return {
+          id,
+          isActive: isActive,
+          user: response.data.data?.user,
+        };
       }
       return rejectWithValue(
         response.data?.message || "Failed to update status",
       );
     } catch (error) {
+      console.error("Toggle status error:", error);
       const message =
         error.response?.data?.message || "Failed to update status";
       toast.error(message);
@@ -113,14 +122,38 @@ export const createUser = createAsyncThunk(
   "users/create",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await api.post("/admin/users", userData);
+      // Ensure password is provided (use default if not)
+      const dataToSend = {
+        ...userData,
+        password: userData.password || "Default123!",
+      };
+
+      console.log("Sending user data:", dataToSend);
+
+      const response = await api.post("/admin/users", dataToSend);
+      console.log("Create user response:", response.data);
+
       if (response.data.success) {
         toast.success("User created successfully");
         return response.data.data.user;
       }
       return rejectWithValue(response.data?.message || "Failed to create user");
     } catch (error) {
+      console.error("Full error object:", error);
+      console.error("Error response:", error.response);
+      console.error("Error response data:", error.response?.data);
+      console.error("Error response errors:", error.response?.data?.errors);
+
       const message = error.response?.data?.message || "Failed to create user";
+      const errors = error.response?.data?.errors;
+
+      // Log each validation error
+      if (errors) {
+        Object.keys(errors).forEach((key) => {
+          console.error(`Validation error - ${key}:`, errors[key]);
+        });
+      }
+
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -174,10 +207,15 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.isLoading = false;
-        if (action.payload !== "canceled") {
-          state.error = action.payload || "Failed to fetch users";
-          console.error("❌ Fetch users error:", action.payload);
+        if (
+          action.error.name === "CanceledError" ||
+          action.payload === "canceled"
+        ) {
+          console.log("Request canceled - ignoring");
+          return;
         }
+        state.error = action.payload || "Failed to fetch users";
+        console.error("❌ Fetch users error:", action.payload);
       })
       // Update User Role
       .addCase(updateUserRole.fulfilled, (state, action) => {
@@ -191,9 +229,15 @@ const userSlice = createSlice({
       })
       // Toggle User Status
       .addCase(toggleUserStatus.fulfilled, (state, action) => {
-        const user = state.users.find((u) => u._id === action.payload.id);
-        if (user) {
-          user.isActive = action.payload.isActive;
+        console.log("Toggle fulfilled payload:", action.payload);
+        const userIndex = state.users.findIndex(
+          (u) => u._id === action.payload.id,
+        );
+        if (userIndex !== -1) {
+          state.users[userIndex].isActive = action.payload.isActive;
+          console.log(
+            `User ${state.users[userIndex].email} status updated to: ${state.users[userIndex].isActive}`,
+          );
         }
       })
       .addCase(toggleUserStatus.rejected, (state, action) => {

@@ -14,7 +14,6 @@ const apiClient = axios.create({
 
 // Track shown errors to prevent duplicate toasts
 const shownErrors = new Set();
-let errorTimeout;
 
 // Request interceptor
 apiClient.interceptors.request.use(
@@ -35,21 +34,21 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// Response interceptor
+// Response interceptor (only ONE)
 apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    const { response, code, message } = error;
+    const { response, code, message, name } = error;
 
-    // ✅ Skip showing toasts for canceled requests (debounce)
+    // ✅ Completely ignore canceled requests (debounce)
     if (
       code === "ERR_CANCELED" ||
-      error.name === "CanceledError" ||
+      name === "CanceledError" ||
       message === "canceled"
     ) {
-      console.log("Request was canceled (debounce) - ignoring error toast");
+      // Silent fail - don't show any toast
       return Promise.reject(error);
     }
 
@@ -89,7 +88,6 @@ apiClient.interceptors.response.use(
     } else if (response?.status >= 500) {
       toast.error("Server error. Please try again.");
     } else if (errorMessage !== "Request failed with status code 404") {
-      // Only show toast for actual errors, not canceled requests
       toast.error(errorMessage);
     }
 

@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { format } from "date-fns";
 import {
   fetchUsers,
   updateUserRole,
@@ -13,7 +14,12 @@ import ConfirmDialog from "../components/common/ConfirmDialog";
 import Pagination from "../components/common/Pagination";
 import SearchBar from "../components/common/SearchBar";
 import LoadingSpinner from "../components/common/LoadingSpinner";
-import { PencilIcon, TrashIcon, PlusIcon } from "@heroicons/react/24/outline";
+import {
+  PencilIcon,
+  TrashIcon,
+  PlusIcon,
+  DocumentArrowDownIcon,
+} from "@heroicons/react/24/outline";
 import { RiRefreshLine } from "react-icons/ri";
 
 const Users = () => {
@@ -21,11 +27,6 @@ const Users = () => {
   const { users, pagination, isLoading, error } = useSelector(
     (state) => state.users,
   );
-
-  // Debug logs
-  console.log("Users in state:", users);
-  console.log("Error in state:", error);
-
   // Local state for filters
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -71,6 +72,66 @@ const Users = () => {
       role: roleFilter,
     };
     dispatch(fetchUsers(filters));
+  };
+
+  // CSV Download for Non-Admin Users Only
+  const downloadUsersCSV = () => {
+    // Filter only non-admin users (regular users)
+    const regularUsers = users.filter((user) => user.role !== "admin");
+
+    if (regularUsers.length === 0) {
+      alert("No regular users found to export");
+      return;
+    }
+
+    // Define CSV headers
+    const headers = [
+      "ID",
+      "Name",
+      "Email",
+      "Role",
+      "Verified",
+      "Joined Date",
+      "Last Login",
+    ];
+
+    // Convert users to CSV rows
+    const csvRows = regularUsers.map((user) => [
+      user._id,
+      user.name,
+      user.email,
+      user.role,
+      user.isVerified ? "Verified" : "Pending",
+      user.isActive ? "Active" : "Inactive",
+      format(new Date(user.createdAt), "dd MMM yyyy"),
+      user.lastLogin
+        ? format(new Date(user.lastLogin), "dd MMM yyyy, h:mm a")
+        : "Never",
+    ]);
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(","),
+      ...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n");
+
+    // Add BOM for UTF-8 encoding (handles special characters)
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    // Create download link
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `regular_users_${format(new Date(), "yyyy-MM-dd")}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleRoleChange = useCallback(
@@ -122,6 +183,11 @@ const Users = () => {
     return styles[role] || "bg-white/10 text-white/60";
   };
 
+  // Get regular users count
+  const regularUsersCount = users.filter(
+    (user) => user.role !== "admin",
+  ).length;
+
   // Loading state
   if (isLoading && users.length === 0) {
     return <LoadingSpinner />;
@@ -171,6 +237,14 @@ const Users = () => {
             </div>
           </div>
           <div className="flex gap-3">
+            <button
+              onClick={downloadUsersCSV}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-green-500 to-green-700 rounded-xl hover:shadow-lg hover:shadow-green-500/25 group"
+              title="Download Regular Users CSV"
+            >
+              <DocumentArrowDownIcon className="w-5 h-5" />
+              Download Users ({regularUsersCount})
+            </button>
             <button
               onClick={handleRefresh}
               disabled={isLoading}
@@ -234,10 +308,13 @@ const Users = () => {
                   Role
                 </th>
                 <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-red-400 uppercase">
-                  Status
+                  Verified
                 </th>
                 <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-red-400 uppercase">
                   Joined
+                </th>
+                <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-red-400 uppercase">
+                  Last Login
                 </th>
                 <th className="px-6 py-4 text-xs font-medium tracking-wider text-right text-red-400 uppercase">
                   Actions
@@ -248,7 +325,7 @@ const Users = () => {
               {users.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="6"
+                    colSpan="7"
                     className="px-6 py-12 text-center text-white/40"
                   >
                     No users found
@@ -287,9 +364,7 @@ const Users = () => {
                           handleRoleChange(user._id, e.target.value)
                         }
                         disabled={actionLoading}
-                        className={`text-xs font-semibold rounded-lg px-3 py-1.5 border-0 focus:ring-2 focus:ring-red-500 cursor-pointer ${getRoleBadgeClass(
-                          user.role,
-                        )}`}
+                        className={`text-xs font-semibold rounded-lg px-3 py-1.5 border-0 focus:ring-2 focus:ring-red-500 cursor-pointer ${getRoleBadgeClass(user.role)}`}
                       >
                         <option value="user" className="bg-black">
                           User
@@ -303,22 +378,26 @@ const Users = () => {
                       </select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() =>
-                          handleStatusToggle(user._id, user.isActive)
-                        }
-                        disabled={actionLoading}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
-                          user.isActive
-                            ? "bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30"
-                            : "bg-gray-500/20 text-gray-400 border border-gray-500/30 hover:bg-gray-500/30"
-                        } disabled:opacity-50`}
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          user.isVerified
+                            ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                            : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                        }`}
                       >
-                        {user.isActive ? "Active" : "Inactive"}
-                      </button>
+                        {user.isVerified ? "Verified" : "Pending"}
+                      </span>
                     </td>
                     <td className="px-6 py-4 text-sm whitespace-nowrap text-white/40">
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      {format(new Date(user.createdAt), "dd MMM yyyy")}
+                    </td>
+                    <td className="px-6 py-4 text-sm whitespace-nowrap text-white/40">
+                      {user.lastLogin
+                        ? format(
+                            new Date(user.lastLogin),
+                            "dd MMM yyyy, h:mm a",
+                          )
+                        : "Never"}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                       <button

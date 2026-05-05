@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useDispatch } from "react-redux";
@@ -12,33 +12,50 @@ import toast from "react-hot-toast";
 const UserModal = ({ isOpen, onClose, user, onSuccess }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "user",
-    isActive: true,
-  });
 
-  useEffect(() => {
+  // Initialize form data based on user prop
+  const [formData, setFormData] = useState(() => {
     if (user) {
-      setFormData({
+      return {
         name: user.name || "",
         email: user.email || "",
         password: "",
         role: user.role || "user",
         isActive: user.isActive !== undefined ? user.isActive : true,
-      });
-    } else {
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        role: "user",
-        isActive: true,
-      });
+      };
     }
-  }, [user]);
+    return {
+      name: "",
+      email: "",
+      password: "",
+      role: "user",
+      isActive: true,
+    };
+  });
+
+  // Reset form when modal opens or user changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  React.useEffect(() => {
+    if (isOpen) {
+      if (user) {
+        setFormData({
+          name: user.name || "",
+          email: user.email || "",
+          password: "",
+          role: user.role || "user",
+          isActive: user.isActive !== undefined ? user.isActive : true,
+        });
+      } else {
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          role: "user",
+          isActive: true,
+        });
+      }
+    }
+  }, [isOpen, user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,13 +83,17 @@ const UserModal = ({ isOpen, onClose, user, onSuccess }) => {
           password: formData.password || "Default123!",
           role: formData.role,
           isVerified: true,
+          isActive: formData.isActive,
         };
+
+        console.log("About to create user with data:", userData);
         await dispatch(createUser(userData)).unwrap();
       }
       onSuccess();
       onClose();
     } catch (error) {
       console.error("Failed to save user:", error);
+      toast.error(error || "Failed to save user");
     } finally {
       setLoading(false);
     }
