@@ -6,7 +6,7 @@ const Layout = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+    <div className="flex h-screen bg-linear-to-br from-black via-gray-900 to-black">
       {/* Animated Red Blobs Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-20 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-blob"></div>

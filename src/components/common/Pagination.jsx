@@ -43,7 +43,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           onClick={() => handlePageChange(page)}
           className={`px-3 py-1.5 rounded-lg transition-all duration-200 ${
             page === currentPage
-              ? "bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg shadow-red-500/25"
+              ? "bg-linear-to-r from-red-500 to-red-700 text-white shadow-lg shadow-red-500/25"
               : "border border-red-500/30 text-white/60 hover:text-white hover:bg-red-500/10"
           }`}
         >

@@ -47,7 +47,7 @@ const Dashboard = () => {
         <div className="relative z-10 p-6 flex items-center justify-between flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <div className="w-2 h-8 bg-gradient-to-b from-red-500 to-red-700 rounded-full"></div>
+              <div className="w-2 h-8 bg-linear-to-b from-red-500 to-red-700 rounded-full"></div>
               <div>
                 <h1 className="text-2xl font-bold text-white">Dashboard</h1>
                 <p className="text-white/40 text-sm mt-0.5">

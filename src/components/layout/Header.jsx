@@ -119,7 +119,7 @@ const Header = ({ sidebarCollapsed, setSidebarCollapsed }) => {
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="flex items-center gap-3 p-1 rounded-lg hover:bg-white/10 transition-all duration-200"
             >
-              <div className="w-9 h-9 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center shadow-lg shadow-red-500/20">
+              <div className="w-9 h-9 bg-linear-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center shadow-lg shadow-red-500/20">
                 <span className="text-white text-sm font-medium">
                   {user?.name?.charAt(0) || "A"}
                 </span>
@@ -135,7 +135,7 @@ const Header = ({ sidebarCollapsed, setSidebarCollapsed }) => {
               <div className="absolute right-0 mt-2 w-64 bg-black border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
                 <div className="p-4 border-b border-white/10 bg-white/5">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-linear-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center">
                       <span className="text-white text-sm font-medium">
                         {user?.name?.charAt(0) || "A"}
                       </span>

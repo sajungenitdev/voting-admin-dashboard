@@ -30,7 +30,7 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message }) => {
             </button>
             <button
               onClick={onConfirm}
-              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-700 rounded-lg hover:shadow-lg hover:shadow-red-500/25 transition-all duration-200"
+              className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-red-500 to-red-700 rounded-lg hover:shadow-lg hover:shadow-red-500/25 transition-all duration-200"
             >
               Delete
             </button>

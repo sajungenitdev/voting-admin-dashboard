@@ -29,7 +29,7 @@ const StatCard = ({ title, value, icon: Icon, trend, trendValue }) => {
             </div>
           )}
         </div>
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg shadow-red-500/20 group-hover:scale-110 transition-all duration-300">
+        <div className="w-12 h-12 rounded-xl bg-linear-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg shadow-red-500/20 group-hover:scale-110 transition-all duration-300">
           <Icon className="h-6 w-6 text-white" />
         </div>
       </div>

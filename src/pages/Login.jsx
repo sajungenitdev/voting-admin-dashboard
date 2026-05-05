@@ -61,10 +61,10 @@ const Login = () => {
         {/* Card Container */}
         <div className="overflow-hidden transition-all duration-500 transform border shadow-2xl bg-black/40 backdrop-blur-xl rounded-2xl border-red-500/30 hover:shadow-red-500/10 hover:shadow-2xl">
           {/* Header with Red Gradient */}
-          <div className="relative h-32 bg-gradient-to-r from-red-600 to-red-800">
+          <div className="relative h-32 bg-linear-to-r from-red-600 to-red-800">
             <div className="absolute inset-0 bg-black/30"></div>
             <div className="absolute transform -translate-x-1/2 -bottom-6 left-1/2">
-              <div className="flex items-center justify-center w-16 h-16 transform shadow-lg bg-gradient-to-br from-red-500 to-red-700 rounded-2xl shadow-red-500/30 rotate-12">
+              <div className="flex items-center justify-center w-16 h-16 transform shadow-lg bg-linear-to-br from-red-500 to-red-700 rounded-2xl shadow-red-500/30 rotate-12">
                 <span className="text-3xl filter drop-shadow-lg">🗳️</span>
               </div>
             </div>
@@ -141,7 +141,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="relative w-full py-3 overflow-hidden font-semibold text-white transition-all duration-300 bg-gradient-to-r from-red-500 to-red-700 rounded-xl group hover:shadow-lg hover:shadow-red-500/25 disabled:opacity-70"
+                className="relative w-full py-3 overflow-hidden font-semibold text-white transition-all duration-300 bg-linear-to-r from-red-500 to-red-700 rounded-xl group hover:shadow-lg hover:shadow-red-500/25 disabled:opacity-70"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   {isLoading ? (
@@ -159,7 +159,7 @@ const Login = () => {
                     </>
                   )}
                 </span>
-                <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-r from-red-600 to-red-800 group-hover:opacity-100"></div>
+                <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-linear-to-r from-red-600 to-red-800 group-hover:opacity-100"></div>
               </button>
             </form>
 

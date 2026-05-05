@@ -257,7 +257,7 @@ const UserModal = ({ isOpen, onClose, user, onSuccess }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-white transition-all duration-200 bg-gradient-to-r from-red-500 to-red-700 rounded-xl hover:shadow-lg hover:shadow-red-500/25 disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white transition-all duration-200 bg-linear-to-r from-red-500 to-red-700 rounded-xl hover:shadow-lg hover:shadow-red-500/25 disabled:opacity-50"
               >
                 {loading ? "Saving..." : user ? "Update User" : "Create User"}
               </button>

@@ -10,6 +10,7 @@ import {
 } from "../store/slices/userSlice";
 import { useDebounce } from "../hooks/useDebounce";
 import UserModal from "../components/users/UserModal";
+import ViewUserModal from "../components/users/ViewUserModal";
 import ConfirmDialog from "../components/common/ConfirmDialog";
 import Pagination from "../components/common/Pagination";
 import SearchBar from "../components/common/SearchBar";
@@ -19,6 +20,7 @@ import {
   TrashIcon,
   PlusIcon,
   DocumentArrowDownIcon,
+  EyeIcon,
 } from "@heroicons/react/24/outline";
 import { RiRefreshLine } from "react-icons/ri";
 
@@ -38,6 +40,8 @@ const Users = () => {
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewingUser, setViewingUser] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     userId: null,
@@ -76,7 +80,6 @@ const Users = () => {
 
   // CSV Download for Non-Admin Users Only
   const downloadUsersCSV = () => {
-    // Filter only non-admin users (regular users)
     const regularUsers = users.filter((user) => user.role !== "admin");
 
     if (regularUsers.length === 0) {
@@ -84,7 +87,6 @@ const Users = () => {
       return;
     }
 
-    // Define CSV headers
     const headers = [
       "ID",
       "Name",
@@ -95,7 +97,6 @@ const Users = () => {
       "Last Login",
     ];
 
-    // Convert users to CSV rows
     const csvRows = regularUsers.map((user) => [
       user._id,
       user.name,
@@ -109,18 +110,15 @@ const Users = () => {
         : "Never",
     ]);
 
-    // Combine headers and rows
     const csvContent = [
       headers.join(","),
       ...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
     ].join("\n");
 
-    // Add BOM for UTF-8 encoding (handles special characters)
     const blob = new Blob(["\uFEFF" + csvContent], {
       type: "text/csv;charset=utf-8;",
     });
 
-    // Create download link
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
@@ -183,7 +181,6 @@ const Users = () => {
     return styles[role] || "bg-white/10 text-white/60";
   };
 
-  // Get regular users count
   const regularUsersCount = users.filter(
     (user) => user.role !== "admin",
   ).length;
@@ -225,7 +222,7 @@ const Users = () => {
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 p-6">
           <div>
             <div className="flex items-center gap-3">
-              <div className="w-2 h-8 rounded-full bg-gradient-to-b from-red-500 to-red-700"></div>
+              <div className="w-2 h-8 rounded-full bg-linear-to-b from-red-500 to-red-700"></div>
               <div>
                 <h1 className="text-2xl font-bold text-white">
                   Users Management
@@ -239,7 +236,7 @@ const Users = () => {
           <div className="flex gap-3">
             <button
               onClick={downloadUsersCSV}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-green-500 to-green-700 rounded-xl hover:shadow-lg hover:shadow-green-500/25 group"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all duration-300 bg-linear-to-r from-green-500 to-green-700 rounded-xl hover:shadow-lg hover:shadow-green-500/25 group"
               title="Download Regular Users CSV"
             >
               <DocumentArrowDownIcon className="w-5 h-5" />
@@ -261,7 +258,7 @@ const Users = () => {
                 setIsModalOpen(true);
               }}
               disabled={actionLoading}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-red-500 to-red-700 rounded-xl hover:shadow-lg hover:shadow-red-500/25 group disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all duration-300 bg-linear-to-r from-red-500 to-red-700 rounded-xl hover:shadow-lg hover:shadow-red-500/25 group disabled:opacity-50"
             >
               <PlusIcon className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
               Add New User
@@ -339,7 +336,7 @@ const Users = () => {
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-10 h-10 shadow-lg bg-gradient-to-br from-red-500 to-red-700 rounded-xl shadow-red-500/20">
+                        <div className="flex items-center justify-center w-10 h-10 shadow-lg bg-linear-to-br from-red-500 to-red-700 rounded-xl shadow-red-500/20">
                           <span className="text-sm font-medium text-white">
                             {user.name?.charAt(0) || "U"}
                           </span>
@@ -402,11 +399,23 @@ const Users = () => {
                     <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                       <button
                         onClick={() => {
+                          setViewingUser(user);
+                          setIsViewModalOpen(true);
+                        }}
+                        disabled={actionLoading}
+                        className="p-2 mr-1 transition-all duration-200 rounded-lg text-white/60 hover:text-blue-400 hover:bg-blue-500/10 disabled:opacity-50"
+                        title="View User Details"
+                      >
+                        <EyeIcon className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => {
                           setSelectedUser(user);
                           setIsModalOpen(true);
                         }}
                         disabled={actionLoading}
-                        className="p-2 mr-2 transition-all duration-200 rounded-lg text-white/60 hover:text-red-400 hover:bg-red-500/10 disabled:opacity-50"
+                        className="p-2 mr-1 transition-all duration-200 rounded-lg text-white/60 hover:text-red-400 hover:bg-red-500/10 disabled:opacity-50"
+                        title="Edit User"
                       >
                         <PencilIcon className="w-5 h-5" />
                       </button>
@@ -416,6 +425,7 @@ const Users = () => {
                         }
                         disabled={actionLoading}
                         className="p-2 transition-all duration-200 rounded-lg text-white/60 hover:text-red-400 hover:bg-red-500/10 disabled:opacity-50"
+                        title="Delete User"
                       >
                         <TrashIcon className="w-5 h-5" />
                       </button>
@@ -453,6 +463,11 @@ const Users = () => {
           };
           dispatch(fetchUsers(filters));
         }}
+      />
+      <ViewUserModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        user={viewingUser}
       />
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
