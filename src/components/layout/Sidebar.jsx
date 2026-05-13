@@ -94,31 +94,24 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
 
       {/* Logo Section */}
       <div
-        className={`relative z-10 p-5 border-b border-white/10 flex items-center ${collapsed ? "justify-center" : "justify-between"}`}
+        className={`relative z-10 p-5 py-0 border-b border-white/10 flex items-center ${collapsed ? "justify-center" : "justify-between"}`}
       >
         <div
-          className={`flex items-center gap-2.5 ${collapsed ? "justify-center" : ""}`}
+          className={`flex w-44 items-center gap-2.5 ${collapsed ? "justify-center" : ""}`}
         >
-          <div className="flex items-center justify-center w-10 h-10 shadow-lg bg-gradient-to-br from-red-500 to-red-700 rounded-xl shadow-red-500/20">
-            <span className="text-xl">🗳️</span>
-          </div>
-          {!collapsed && (
-            <div>
-              <h1 className="text-lg font-bold tracking-tight text-white">
-                Voting Panel
-              </h1>
-              <p className="text-xs text-white/40">Admin Dashboard</p>
-            </div>
-          )}
+          <img
+            src="/logo-black.png"
+            alt=""
+          />
         </div>
-        {!collapsed && (
+        {/* {!collapsed && (
           <button
             onClick={toggleSidebar}
             className="p-1.5 rounded-lg hover:bg-white/10 transition-all duration-200"
           >
             <ChevronLeftIcon className="w-5 h-5 text-white/60" />
           </button>
-        )}
+        )} */}
       </div>
 
       {/* Expand Button (when collapsed) */}

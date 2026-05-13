@@ -61,12 +61,15 @@ const Login = () => {
         {/* Card Container */}
         <div className="overflow-hidden transition-all duration-500 transform border shadow-2xl bg-black/40 backdrop-blur-xl rounded-2xl border-red-500/30 hover:shadow-red-500/10 hover:shadow-2xl">
           {/* Header with Red Gradient */}
-          <div className="relative h-32 bg-linear-to-r from-red-600 to-red-800">
+          <div className="relative h-32 bg-linear-to-r from-black-600 to-red-800">
             <div className="absolute inset-0 bg-black/30"></div>
             <div className="absolute transform -translate-x-1/2 -bottom-6 left-1/2">
-              <div className="flex items-center justify-center w-16 h-16 transform shadow-lg bg-linear-to-br from-red-500 to-red-700 rounded-2xl shadow-red-500/30 rotate-12">
-                <span className="text-3xl filter drop-shadow-lg">🗳️</span>
-              </div>
+              
+              <img
+                src="/logo-black.png"
+                alt="Logo"
+                className=""
+              />
             </div>
           </div>
 
